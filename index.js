@@ -193,7 +193,7 @@ function TokenStream(input) {
     /**
      * 
      * read and check the next token 
-     * @returns {Object} token 
+     * @returns {Object} ast 
      */
     function readNext() {
         readWhile(isWhitespace)
@@ -305,27 +305,47 @@ let PRECEDENCE = {
 function parse(input) {
     return parseToplevel()
 
-    function isPunc(ch) {
+    function isPunc(str) {
         let token = input.peek()
-        return token && token.type === 'punc' && (!ch || token.value === ch)
+        return token && token.type === 'punc' && (!str || token.value === str)
     }
 
+    function isKeyword(kw) {
+        let token = input.peek()
+        return token && token.type === 'kw' && (!kw || token.value === kw) && token
+    }
 
+    function isOp(op) {
+        let token = input.peek()
+        return token && token.type === 'op' && (!op || token.value === op) && token
+    }
 
-    /**
-     * 
-     * This function will be invoked when the lambda keyword 
-     * has already been seen and “eaten” from the input, 
-     * so all it cares for is to parse the argument names;
-     * but they're in parentheses and delimited by commas.
-     * @returns lambda 
-     */
-    function parseLambda() {
-        return {
-            type: 'lambda',
-            vars: delimited('(', ')', ',', parseVarname),
-            body: parseExpression()
+    function skipPunc(str) {
+        if (isPunc(str)) {
+            input.next()
+        } else {
+            input.croak(`Expecting punctuation: "${str}"`)
         }
+    }
+
+    function skipKeyward(kw) {
+        if (isKeyword(kw)) {
+            input.next()
+        } else {
+            input.croak(`Expecting keyword: "${kw}"`)
+        }
+    }
+
+    function skipOp(op) {
+        if (isOp(op)) {
+            input.next()
+        } else {
+            input.croak(`Expecting operator: "${op}"`)
+        }
+    }
+
+    function unexpected() {
+        input.croak(`Unexpected token: ${JSON.stringify(input.peek())}`)
     }
 
     /**
@@ -335,10 +355,10 @@ function parse(input) {
      * @param {String} stop 
      * @param {String} separator 
      * @param {function} parser 
-     * @return {Array} a, store some token
+     * @return {Array} a, store a series of tokens which returns by parser
      */
     function delimited(start, stop, separator, parser) {
-        let a = []
+        let arr = []
         first = true
         // skip the punctuation
         skipPunc(start)
@@ -355,133 +375,23 @@ function parse(input) {
             if (isPunc(stop)) {
                 break
             }
-            a.push(parser())
+            arr.push(parser())
         }
         skipPunc(stop)
-        return a
-    }
-
-    function parseToplevel() {
-        let prog = []
-        while (!input.eof()) {
-            prog.push(parseExpression())
-            if (!input.eof()) {
-                skipPunc(';')
-            }
-        }
-
-        return {
-            type: 'prog',
-            prog: prog
-        }
+        return arr
     }
 
     /**
      * 
-     * @returns {Object} 
+     * These `maybe*` functions check what follows after 
+     * an expression in order to decide whether to wrap 
+     * that expression in another node, or just return it as is.
+     * @param {function} expression 
+     * @returns {Object}
      */
-    function parseIf() {
-        // this throws an error if the current token is not the given keyword
-        skipKeyward('if')
-        // parse the condition
-        let cond = parseExpression()
-        // if the consequent branch doesn't 
-        // start with a { we require the keyword then to be present
-        if (!isPunc("{")) {
-            skipKeyward('then')
-        }
-        let then = parseExpression()
-        let ret = {
-            type: 'if',
-            cond: cond,
-            then: then
-        }
-        // when there is a 'else'
-        if (isKeyword('else')) {
-            input.next()
-            ret.else = parseExpression()
-        }
-
-        return ret
-    }
-
-    /**
-     * 
-     * parseAtom() does the main dispatching job, 
-     * depending on the current token:
-     * @return {Object}
-     */
-    function parseAtom() {
-        return maybeCall(() => {
-            if (isPunc('(')) {
-                input.next()
-                var expression = parseExpression()
-                skipPunc(')')
-                return expression
-            }
-            if (isPunc('{')) {
-                return parseProg()
-            } else if (isKeyword('if')) {
-                return parseIf()
-            } else if (isKeyword('true') || isKeyword('false')) {
-                return parseBool()
-            } else if (isKeyword('lambda') || isKeyword('λ')) {
-                input.next()
-                return parseLambda()
-            }
-
-            let token = input.next()
-            if (token.type === 'var' || token.type === 'num' || token.type === 'str') {
-                return token
-            }
-            unexpected()
-        })
-    }
-    // It will do some minor optimization at this point — 
-    // if the prog is empty, then it just returns FALSE. 
-    // If it has a single expression, it is returned 
-    //instead of a "prog" node. Otherwise it returns
-    // a "prog" node containing the expressions.
-    function parseProg() {
-        let prog = delimited('{', '}', ';')
-        if (prog.length === 0) {
-            return FALSE
-        }
-        if (prog.length === 1) {
-            return prog[0]
-        }
-        return {
-            type: 'prog',
-            prog: prog
-        }
-    }
-
-    /**
-     * 
-     * Contrary to parseAtom(), this one will extend
-     *  an expression as much as possible to the right
-     *  using maybeBinary(), which is explained below.
-     */
-    function parseExpression() {
-        return maybeCall(() => maybeBinary(parseAtom(), 0))
-    }
-
-    // These `maybe*` functions check what follows after 
-    // an expression in order to decide whether to wrap 
-    // that expression in another node, or just return it as is.
-
-
     function maybeCall(expression) {
-        expression = expression()
-        return isPunc('(') ? parseCall(expression) : expression
-    }
-
-    function parseCall(func) {
-        return {
-            type: 'call',
-            func: func,
-            args: delimited('(', ')', ',', parseExpression)
-        }
+        expr = expression()
+        return isPunc('(') ? parseCall(expr) : expr
     }
 
     /**
@@ -493,7 +403,8 @@ function parse(input) {
      * since myPrecedence is initially zero, any operator will trigger
      * the building of a "binary" node (or "assign" when the operator is =)
      * @param {Object} left 
-     * @param {Number} myPrecedence 
+     * @param {Number} myPrecedence
+     * @return {Object} left
      */
     function maybeBinary(left, myPrecedence) {
         let token = isOp()
@@ -516,6 +427,161 @@ function parse(input) {
             }
         }
         return left
+    }
+
+    /**
+     * 
+     * parseAtom() does the main dispatching job, 
+     * depending on the current token:
+     * @return {Object}
+     */
+    function parseAtom() {
+
+        return maybeCall(() => {
+            if (isPunc('(')) {
+                input.next()
+                var expression = parseExpression()
+                skipPunc(')')
+                return expression
+            }
+            if (isPunc('{')) {
+                return parseProg()
+            }
+            if (isKeyword('if')) {
+                return parseIf()
+            }
+            if (isKeyword('true') || isKeyword('false')) {
+                return parseBool()
+            }
+            if (isKeyword('lambda') || isKeyword('λ')) {
+                input.next()
+                return parseLambda()
+            }
+
+            let token = input.next()
+            if (token.type === 'var' || token.type === 'num' || token.type === 'str') {
+                return token
+            }
+            unexpected()
+        })
+    }
+
+    /**
+     * 
+     * Contrary to parseAtom(), this one will extend
+     *  an expression as much as possible to the right
+     *  using maybeBinary(), which is explained below.
+     * @return {Object} 
+     */
+    function parseExpression() {
+        return maybeCall(() => maybeBinary(parseAtom(), 0))
+    }
+
+    /**
+     * 
+     * @returns {any} basic type's value
+     */
+    function parseVarname() {
+        let name = input.next()
+        if (name.type !== 'var') {
+            input.croak('Expecting variable name')
+        }
+        return name.value
+    }
+
+    /**
+     * 
+     * This function will be invoked when the lambda keyword 
+     * has already been seen and “eaten” from the input, 
+     * so all it cares for is to parse the argument names;
+     * but they're in parentheses and delimited by commas.
+     * @returns {Object} lambda ast 
+     */
+    function parseLambda() {
+        return {
+            type: 'lambda',
+            vars: delimited('(', ')', ',', parseVarname),
+            body: parseExpression()
+        }
+    }
+
+    /**
+     * 
+     * it will be called firstly
+     * @returns {Object} prog ast
+     */
+    function parseToplevel() {
+        let prog = []
+        while (!input.eof()) {
+            prog.push(parseExpression())
+            if (!input.eof()) {
+                skipPunc(';')
+            }
+        }
+        return {
+            type: 'prog',
+            prog: prog
+        }
+    }
+
+    /**
+     * 
+     * @returns {Object}
+     */
+    function parseIf() {
+        // this throws an error if the current token is not the given keyword
+        skipKeyward('if')
+        // parse the condition
+        let cond = parseExpression()
+        // if the consequent branch doesn't 
+        // start with a { we require the keyword then to be present
+        if (!isPunc('{')) {
+            skipKeyward('then')
+        }
+        let then = parseExpression()
+        let ret = {
+            type: 'if',
+            cond: cond,
+            then: then
+        }
+        // when there is a 'else'
+        if (isKeyword('else')) {
+            input.next()
+            ret.else = parseExpression()
+        }
+        return ret
+    }
+
+    /**
+     * 
+     * It will do some minor optimization at this point — 
+     * if the prog is empty, then it just returns FALSE. 
+     * If it has a single expression, it is returned 
+     * instead of a "prog" node. Otherwise it returns
+     * a "prog" node containing the expressions.
+     * @returns {Object} 
+     */
+    function parseProg() {
+        let prog = delimited('{', '}', ';')
+        if (prog.length === 0) {
+            return FALSE
+        }
+        if (prog.length === 1) {
+            return prog[0]
+        }
+        return {
+            type: 'prog',
+            prog: prog
+        }
+    }
+
+
+    function parseCall(func) {
+        return {
+            type: 'call',
+            func: func,
+            args: delimited('(', ')', ',', parseExpression)
+        }
     }
 }
 
