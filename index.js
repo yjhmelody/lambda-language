@@ -16,6 +16,7 @@ function InputStream(input) {
         croak
     }
     /**
+     * 
      * read next symbol 
      * @returns 
      */
@@ -30,6 +31,7 @@ function InputStream(input) {
         return ch
     }
     /**
+     * 
      * peek the symbol
      * @returns {String}  
      */
@@ -37,6 +39,7 @@ function InputStream(input) {
         return input.charAt(pos)
     }
     /**
+     * 
      * check if it is eof
      * @returns {Boolean}
      */
@@ -44,6 +47,7 @@ function InputStream(input) {
         return peek() === ''
     }
     /**
+     * 
      * throw a error
      * @param {any} msg 
      */
@@ -100,7 +104,7 @@ function TokenStream(input) {
 
     /**
      * 
-     * 
+     * readWhile is used to check many structs
      * @param {function} predicate 
      * @returns {String}
      */
@@ -148,8 +152,9 @@ function TokenStream(input) {
 
     /**
      * 
+     * to escape some special symbols
      * @param {String} end 
-     * @returns {String}
+     * @returns {String} mystring
      */
     function readEscaped(end) {
         let escaped = false
@@ -185,49 +190,70 @@ function TokenStream(input) {
         input.next()
     }
 
+    /**
+     * 
+     * read and check the next token 
+     * @returns {Object} token 
+     */
     function readNext() {
         readWhile(isWhitespace)
         if (input.eof()) {
             return null
         }
         let ch = input.peek()
+
         if (ch == '#') {
             skipComment()
             // recursive
             return readNext()
-        } else if (ch == '"') {
+        }
+        if (ch == '"') {
             // when meet string
             return readString()
-        } else if (isDigit(ch)) {
+        }
+        if (isDigit(ch)) {
             return readNumber()
-        } else if (isIdStart(ch)) {
+        }
+        if (isIdStart(ch)) {
             return readIdent()
-        } else if (isPunc(ch)) {
+        }
+        if (isPunc(ch)) {
             return {
                 type: 'punc',
                 value: input.next()
             }
-        } else if (isOpChar(ch)) {
+        }
+        if (isOpChar(ch)) {
             return {
                 type: 'op',
                 value: readWhile(isOpChar)
             }
-        } else {
-            input.croak('cannot handle character: ' + ch)
         }
+        input.croak('cannot handle character: ' + ch)
     }
 
+    /**
+     * 
+     * @returns {Object} token 
+     */
     function peek() {
         return current || (current = readNext())
     }
 
-    // next token
+    /**
+     * 
+     * @returns {Object} token
+     */
     function next() {
-        let tok = current
+        let token = current
         current = null
-        return tok || readNext()
+        return token || readNext()
     }
 
+    /**
+     * check eof 
+     * @returns {Boolean}
+     */
     function eof() {
         return peek() == null
     }
@@ -248,6 +274,7 @@ let TRUR = {
 }
 
 /**
+ * 
  * maybeBinary(left, my_prec) is used to compose 
  * binary expressions like 1 + 2 * 3. The trick to 
  * parse them properly is to correctly define 
@@ -272,7 +299,6 @@ let PRECEDENCE = {
 
 /**
  * 
- * 
  * @param {TokenStream} input 
  * @returns {Object} ast
  */
@@ -283,6 +309,8 @@ function parse(input) {
         let token = input.peek()
         return token && token.type === 'punc' && (!ch || token.value === ch)
     }
+
+
 
     /**
      * 
@@ -315,9 +343,10 @@ function parse(input) {
         // skip the punctuation
         skipPunc(start)
         while (!input.eof()) {
-            if (ispunc) {
+            if (isPunc(stop)) {
                 break
-            } else if (first) {
+            }
+            if (first) {
                 first = false
             } else {
                 skipPunc(separator)
@@ -349,7 +378,6 @@ function parse(input) {
 
     /**
      * 
-     * 
      * @returns {Object} 
      */
     function parseIf() {
@@ -378,6 +406,7 @@ function parse(input) {
     }
 
     /**
+     * 
      * parseAtom() does the main dispatching job, 
      * depending on the current token:
      * @return {Object}
@@ -408,7 +437,7 @@ function parse(input) {
             unexpected()
         })
     }
-    //  It will do some minor optimization at this point — 
+    // It will do some minor optimization at this point — 
     // if the prog is empty, then it just returns FALSE. 
     // If it has a single expression, it is returned 
     //instead of a "prog" node. Otherwise it returns
@@ -428,6 +457,7 @@ function parse(input) {
     }
 
     /**
+     * 
      * Contrary to parseAtom(), this one will extend
      *  an expression as much as possible to the right
      *  using maybeBinary(), which is explained below.
@@ -455,6 +485,7 @@ function parse(input) {
     }
 
     /**
+     * 
      * If it's an operator that has a higher precedence than ours, 
      * then it wraps left in a new "binary" node, and for the right 
      * side it repeats the trick at the new precedence level (*):
