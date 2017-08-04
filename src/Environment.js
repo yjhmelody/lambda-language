@@ -96,6 +96,7 @@ class Environment {
     }
 }
 
+Environment.evaluate = evaluate
 
 
 
@@ -292,41 +293,5 @@ function makeLambda(expr, env) {
     }
 }
 
+module.exports = Environment
 // Primitive functions
-
-// let code = 'sum = λ(x, y) x + y; println(sum(2, 3.5));'
-let code = 
-`
-# demo1
-print_range = λ(a, b) if a <= b {
-                        println(a);
-                        if a + 1 <= b {
-                          print_range(a + 1, b);
-                        } 
-                        else 
-                            println("");
-                      };
-print_range(1, 100);
-
-# demo2
-cons = λ(a, b) λ(f) f(a, b);
-car = λ(cell) cell(λ(a, b) a);
-cdr = λ(cell) cell(λ(a, b) b);
-NIL = λ(f) f(NIL, NIL);
-
-x = cons(1, cons(2, cons(3, cons(4, cons(5, NIL)))));
-println(car(x));                      # 1
-println(car(cdr(x)));                 # 2
-println(car(cdr(cdr(x))));            # 3
-println(car(cdr(cdr(cdr(x)))));       # 4
-println(car(cdr(cdr(cdr(cdr(x))))));  # 5
-`
-let ast = parser(TokenStream(InputStream(code)))
-
-let globalEnv = new Environment()
-
-globalEnv.def('println', (val) => {
-    console.log(val)
-})
-
-evaluate(ast, globalEnv)
