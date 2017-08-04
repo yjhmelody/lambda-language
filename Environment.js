@@ -294,7 +294,8 @@ function makeLambda(expr, env) {
 
 // Primitive functions
 
-let code = 'sum = lambda(x, y) x + y; print(sum(2, 3));'
+let code = ' sum = 1 + 233; println(sum)'
+// let code = ''
 
 let ast = parser(TokenStream(InputStream(code)))
 

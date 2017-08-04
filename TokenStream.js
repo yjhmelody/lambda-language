@@ -1,4 +1,3 @@
-
 module.exports = TokenStream
 
 /**
@@ -15,11 +14,11 @@ function TokenStream(input) {
         next,
         peek,
         eof,
-        croak:input.croak
+        croak: input.croak
     }
 
-    function isKeyword(ch) {
-        return keywords.includes(` ${ch} `)
+    function isKeyword(x) {
+        return keywords.includes(' ' + x + ' ')
     }
 
     function isDigit(ch) {
@@ -55,10 +54,15 @@ function TokenStream(input) {
     function readWhile(predicate) {
         let str = ''
         //when not arriving at eof && next char satisfy the condition of predicate    
+        // warming: debug
+        // console.log('peek', input.peek())
+        // console.log('pred', predicate)
+        
         while (!input.eof() && predicate(input.peek())) {
             str += input.next()
-            return str
         }
+        // console.log('str', str)
+        return str
     }
 
     /**
@@ -69,8 +73,9 @@ function TokenStream(input) {
      */
     function readNumber() {
         let hasDot = false
-        let numbers = readWhile(function (ch) {
-            if (ch == '.') {
+        let number = readWhile(function (ch) {
+            // may meet two dots
+            if (ch === '.') {
                 if (hasDot) {
                     return false
                 }
@@ -98,7 +103,7 @@ function TokenStream(input) {
      * 
      * to escape some special symbols
      * @param {String} end 
-     * @returns {String} mystring
+     * @returns {String} str
      */
     function readEscaped(end) {
         let escaped = false
@@ -110,10 +115,10 @@ function TokenStream(input) {
             if (escaped) {
                 str += ch
                 escaped = false
-            } else if (ch == '\\') {
+            } else if (ch === '\\') {
                 escaped = true
                 // when meet end char
-            } else if (ch == end) {
+            } else if (ch === end) {
                 break
             } else {
                 str += ch
@@ -130,7 +135,7 @@ function TokenStream(input) {
     }
 
     function skipComment() {
-        readWhile(ch => ch != '\n')
+        readWhile(ch => ch !== '\n')
         input.next()
     }
 
@@ -146,12 +151,12 @@ function TokenStream(input) {
         }
         let ch = input.peek()
 
-        if (ch == '#') {
+        if (ch === '#') {
             skipComment()
             // recursive
             return readNext()
         }
-        if (ch == '"') {
+        if (ch === '"') {
             // when meet string
             return readString()
         }
@@ -174,7 +179,7 @@ function TokenStream(input) {
                 value: readWhile(isOpChar)
             }
         }
-        input.croak('cannot handle character: ' + ch)
+        input.croak('Cannot handle character: ' + ch)
     }
 
     /**
@@ -202,5 +207,4 @@ function TokenStream(input) {
     function eof() {
         return peek() == null
     }
-
 }

@@ -1,4 +1,3 @@
-
 module.exports = parser
 
 // we're going to use the FALSE node in various places,
@@ -8,7 +7,7 @@ let FALSE = {
     value: false
 }
 
-let TRUR = {
+let TRUE = {
     type: 'bool',
     value: true
 }
@@ -39,7 +38,7 @@ let PRECEDENCE = {
 
 /**
  * 
- * @param {TokenStream} input 
+ * @param {TokenStream} input, operate tokens 
  * @returns {Object} ast
  */
 function parser(input) {
@@ -47,7 +46,7 @@ function parser(input) {
 
     function isPunc(str) {
         let token = input.peek()
-        return token && token.type === 'punc' && (!str || token.value === str)
+        return token && token.type === 'punc' && (!str || token.value === str) && token
     }
 
     function isKeyword(kw) {
@@ -61,6 +60,7 @@ function parser(input) {
     }
 
     function skipPunc(str) {
+        // bug: cannot Identity `;`
         if (isPunc(str)) {
             input.next()
         } else {

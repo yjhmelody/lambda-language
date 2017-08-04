@@ -1,6 +1,4 @@
-
 module.exports = InputStream
-
 
 /**
  * 
@@ -22,7 +20,7 @@ function InputStream(input) {
     /**
      * 
      * read next symbol 
-     * @returns 
+     * @returns {String} ch
      */
     function next() {
         let ch = input.charAt(pos++)
@@ -48,7 +46,7 @@ function InputStream(input) {
      * @returns {Boolean}
      */
     function eof() {
-        return peek() === ''
+        return peek() == ''
     }
     /**
      * 
