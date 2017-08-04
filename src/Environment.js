@@ -97,7 +97,7 @@ class Environment {
 }
 
 Environment.evaluate = evaluate
-
+Environment.prototype.evaluate = evaluate
 
 
 // num { type: "num", value: NUMBER }

@@ -4,19 +4,12 @@ let InputStream = require('../src/InputStream')
 let TokenStream = require('../src/TokenStream')
 let parser = require('../src/parser')
 let Environment = require('../src/Environment')
+let env = require('../index')
 
 const fs = require('fs')
 
 let args = process.argv
 code = fs.readFileSync(args[2]).toString()
-
-let globalEnv = new Environment()
 ast = parser(TokenStream(InputStream(code)))
 
-globalEnv.def('println', (val) => {
-    console.log(val)
-})
-
-// globalEnv.def('readFileSync', ())
-
-Environment.evaluate(ast, globalEnv)
+env.evaluate(ast, env)

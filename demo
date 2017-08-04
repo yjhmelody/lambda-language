@@ -1,3 +1,6 @@
+
+
+
 print_range = λ(a, b) if a <= b {
                         println(a);
                         if a + 1 <= b {
@@ -19,3 +22,7 @@ println(car(cdr(x)));                 # 2
 println(car(cdr(cdr(x))));            # 3
 println(car(cdr(cdr(cdr(x)))));       # 4
 println(car(cdr(cdr(cdr(cdr(x))))));  # 5
+
+
+code = readFileSync("./demo");
+println(code)
