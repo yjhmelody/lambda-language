@@ -21,7 +21,7 @@ function InputStream(input) {
      * @returns 
      */
     function next() {
-        var ch = input.charAt(pos++)
+        let ch = input.charAt(pos++)
         if (ch == '\n') {
             line++
             col = 0
@@ -224,6 +224,7 @@ function TokenStream(input) {
             }
         }
         if (isOpChar(ch)) {
+            // can read a multi-character operator
             return {
                 type: 'op',
                 value: readWhile(isOpChar)
@@ -440,7 +441,7 @@ function parse(input) {
         return maybeCall(() => {
             if (isPunc('(')) {
                 input.next()
-                var expression = parseExpression()
+                let expression = parseExpression()
                 skipPunc(')')
                 return expression
             }
