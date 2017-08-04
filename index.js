@@ -95,7 +95,7 @@ function TokenStream(input) {
      */
     function readWhile(predicate) {
         let str = ''
-        //当前字符存在且下个字符满足条件
+        //when not arriving at eof && next char satisfy the condition of predicate    
         while (!input.eof() && predicate(input.peek())) {
             str += input.next()
             return str
@@ -148,13 +148,13 @@ function TokenStream(input) {
         input.next()
         while (!input.eof()) {
             let ch = input.next()
-            // 留意转移字符
+            // attention to escaped char
             if (escaped) {
                 str += ch
                 escaped = false
             } else if (ch == '\\') {
                 escaped = true
-                // 遇见终结字符
+            // when meet end char
             } else if (ch == end) {
                 break
             } else {
@@ -183,12 +183,11 @@ function TokenStream(input) {
         }
         let ch = input.peek()
         if (ch == '#') {
-            // 跳过注释
             skipComment()
-            // 递归
+            // recursive
             return readNext()
         } else if (ch == '"') {
-            // 读到字符串
+            // when meet string
             return readString()
         } else if (isDigit(ch)) {
             return readNumber()
