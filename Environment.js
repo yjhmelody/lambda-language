@@ -63,7 +63,7 @@ class Environment {
         if (name in this.vars) {
             return this.vars[name]
         }
-        throw new ReferenceError('Undefined variable' + name)
+        throw new ReferenceError('Undefined variable ' + name)
     }
     /**
      * 
@@ -78,7 +78,7 @@ class Environment {
         let scope = this.lookup(name)
         // let's not allow defining globals from a nested environment
         if (!scope && this.parent) {
-            throw new ReferenceError('Undefined variable' + name)
+            throw new ReferenceError('Undefined variable ' + name)
         }
         return (scope || this).vars[name] = value
     }
@@ -159,7 +159,7 @@ function evaluate(expr, env) {
             if (cond) {
                 return evaluate(expr.then, env)
             } else {
-                return exp.else ? evaluate(expr.else, env) : false
+                return expr.else ? evaluate(expr.else, env) : false
             }
 
             // A "prog" is a sequence of expressions. 
@@ -294,15 +294,21 @@ function makeLambda(expr, env) {
 
 // Primitive functions
 
-let code = ' sum = 1 + 233; println(sum)'
-// let code = ''
-
+// let code = 'sum = λ(x, y) x + y; println(sum(2, 3.5));'
+let code = `print_range = λ(a, b) if a <= b {
+                        println(a);
+                        if a + 1 <= b {
+                          print_range(a + 1, b);
+                        } else println("");
+                      };
+print_range(1, 1000);
+`
 let ast = parser(TokenStream(InputStream(code)))
 
 let globalEnv = new Environment()
 
-globalEnv.def('println', (txt) => {
-    console.log(txt)
+globalEnv.def('println', (val) => {
+    console.log(val)
 })
 
 evaluate(ast, globalEnv)

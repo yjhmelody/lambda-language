@@ -313,7 +313,7 @@ function parser(input) {
      * @returns {Object} 
      */
     function parseProg() {
-        let prog = delimited('{', '}', ';')
+        let prog = delimited('{', '}', ';', parseExpression)
         if (prog.length === 0) {
             return FALSE
         }
