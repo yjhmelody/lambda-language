@@ -40,6 +40,8 @@ function InputStream(input) {
     }
 }
 
+
+
 /**
  * 
  * 
@@ -137,8 +139,6 @@ function TokenStream(input) {
 
     /**
      * 
-     * 
-     * 
      * @param {String} end 
      * @returns {String}
      */
@@ -212,6 +212,7 @@ function TokenStream(input) {
         return current || (current = readNext())
     }
 
+    // next token
     function next() {
         let tok = current
         current = null
@@ -245,6 +246,7 @@ function TokenStream(input) {
      * @param {String} stop 
      * @param {String} separator 
      * @param {function} parser 
+     * @return {Array} a, store some token
      */
     function delimited(start, stop, separator, parser) {
         let a = []
@@ -284,6 +286,11 @@ function TokenStream(input) {
         }
     }
 
+    /**
+     * 
+     * 
+     * @returns {Object} 
+     */
     function parseIf() {
         // this throws an error if the current token is not the given keyword
         skipKeyward('if')
@@ -312,27 +319,138 @@ function TokenStream(input) {
     /**
      * parseAtom() does the main dispatching job, 
      * depending on the current token:
-     * @return 
+     * @return {Object}
      */
     function parseAtom() {
         return maybeCall(() => {
-            if(isPunc('(')){
+            if (isPunc('(')) {
                 input.next()
                 var expression = parseExpression()
                 skipPunc(')')
                 return expression
             }
-            if(isPunc('{')){
+            if (isPunc('{')) {
                 return parseProg()
-            }
-            else if(isKeyword('if')){
+            } else if (isKeyword('if')) {
                 return parseIf()
-            }
-            else if(isKeyword('true') || isKeyword('false')){
+            } else if (isKeyword('true') || isKeyword('false')) {
                 return parseBool()
+            } else if (isKeyword('lambda') || isKeyword('λ')) {
+                input.next()
+                return parseLambda()
             }
+
+            let token = input.next()
+            if (token.type === 'var' || token.type === 'num' || token.type === 'str') {
+                return token
+            }
+            unexpected()
         })
     }
+    // we're going to use the FALSE node in various places,
+    // so I'm making it a global.
+    var FALSE = {
+        type: "bool",
+        value: false
+    };
+    //  It will do some minor optimization at this point — 
+    // if the prog is empty, then it just returns FALSE. 
+    // If it has a single expression, it is returned 
+    //instead of a "prog" node. Otherwise it returns
+    // a "prog" node containing the expressions.
+    function parseProg() {
+        let prog = delimited('{', '}', ';')
+        if (prog.length === 0) {
+            return FALSE
+        }
+        if (prog.length === 1) {
+            return prog[0]
+        }
+        return {
+            type: 'prog',
+            prog: prog
+        }
+    }
+
+    /**
+     * Contrary to parseAtom(), this one will extend
+     *  an expression as much as possible to the right
+     *  using maybeBinary(), which is explained below.
+     */
+    function parseExpression() {
+        return maybeCall(() => maybeBinary(parseAtom(), 0))
+    }
+
+    // These `maybe*` functions check what follows after 
+    // an expression in order to decide whether to wrap 
+    // that expression in another node, or just return it as is.
+
+
+    function maybeCall(expression) {
+        expression = expression()
+        return isPunc('(') ? parseCall(expression) : expression
+    }
+
+    function parseCall(func) {
+        return {
+            type: 'call',
+            func: func,
+            args: delimited('(', ')', ',', parseExpression)
+        }
+    }
+
+    /**
+     * maybeBinary(left, my_prec) is used to compose 
+     * binary expressions like 1 + 2 * 3. The trick to 
+     * parse them properly is to correctly define 
+     * the operator precedence, so we'll start with that:
+     */
+    let PRECEDENCE = {
+        "=": 1,
+        "||": 2,
+        "&&": 3,
+        "<": 7,
+        ">": 7,
+        "<=": 7,
+        ">=": 7,
+        "==": 7,
+        "!=": 7,
+        "+": 10,
+        "-": 10,
+        "*": 20,
+        "/": 20,
+        "%": 20,
+    }
+
+    /**
+     * If it's an operator that has a higher precedence than ours, 
+     * then it wraps left in a new "binary" node, and for the right 
+     * side it repeats the trick at the new precedence level (*):
+     * @param {Object} left 
+     * @param {Number} myPrecedence 
+     */
+    function maybeBinary(left, myPrecedence) {
+        let token = isOp()
+        if (token) {
+            let hisPrecedence = PRECEDENCE[token.value]
+            // need to read more token
+            if (hisPrecedence > myPrecedence) {
+                input.next()
+                // do the operation which is higher precedence
+                // after recursive finish, it is the right operand
+                let right = maybeBinary(parseAtom(), hisPrecedence) // (*)
+                let binary = {
+                    type: token.value === '=' ? 'assign' : 'binary',
+                    operator: token.value,
+                    left: left,
+                    right: right
+                }
+                return maybeBinary(binary, myPrecedence)
+            }
+        }
+        return left
+    }
+
 }
 
 
