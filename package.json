@@ -1,0 +1,14 @@
+{
+  "name": "implement-a-pl",
+  "version": "0.0.1",
+  "description": "compiler",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "compiler"
+  ],
+  "author": "yjhmelody",
+  "license": "ISC"
+}
