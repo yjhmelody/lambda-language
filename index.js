@@ -387,7 +387,7 @@ function parse(input) {
      * an expression in order to decide whether to wrap 
      * that expression in another node, or just return it as is.
      * @param {function} expression 
-     * @returns {Object}
+     * @returns {Object} ast
      */
     function maybeCall(expression) {
         expr = expression()
@@ -404,7 +404,7 @@ function parse(input) {
      * the building of a "binary" node (or "assign" when the operator is =)
      * @param {Object} left 
      * @param {Number} myPrecedence
-     * @return {Object} left
+     * @return {Object} op ast
      */
     function maybeBinary(left, myPrecedence) {
         let token = isOp()
@@ -433,7 +433,7 @@ function parse(input) {
      * 
      * parseAtom() does the main dispatching job, 
      * depending on the current token:
-     * @return {Object}
+     * @return {Object} ast
      */
     function parseAtom() {
 
@@ -468,10 +468,21 @@ function parse(input) {
 
     /**
      * 
+     * @returns {Object} bool ast 
+     */
+    function parseBool() {
+        return {
+            type: 'bool',
+            value: input.next().value === 'true'
+        }
+    }
+
+    /**
+     * 
      * Contrary to parseAtom(), this one will extend
      *  an expression as much as possible to the right
      *  using maybeBinary(), which is explained below.
-     * @return {Object} 
+     * @return {Object} ast
      */
     function parseExpression() {
         return maybeCall(() => maybeBinary(parseAtom(), 0))
@@ -526,7 +537,7 @@ function parse(input) {
 
     /**
      * 
-     * @returns {Object}
+     * @returns {Object} if ast
      */
     function parseIf() {
         // this throws an error if the current token is not the given keyword
@@ -575,7 +586,11 @@ function parse(input) {
         }
     }
 
-
+    /**
+     * 
+     * @param {any} func 
+     * @returns {Object} call ast 
+     */
     function parseCall(func) {
         return {
             type: 'call',
