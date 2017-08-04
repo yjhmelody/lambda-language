@@ -52,3 +52,9 @@ output:
 5
 ***Result: false
 ```
+
+```
+code = fs-readFileSync("./demo");
+println(code);
+println(os-arch());
+```

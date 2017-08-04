@@ -23,6 +23,6 @@ println(car(cdr(cdr(x))));            # 3
 println(car(cdr(cdr(cdr(x)))));       # 4
 println(car(cdr(cdr(cdr(cdr(x))))));  # 5
 
-
-code = readFileSync("./demo");
-println(code)
+code = fs-readFileSync("./demo");
+println(code);
+println(os-arch());
