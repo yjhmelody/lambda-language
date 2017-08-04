@@ -134,7 +134,7 @@ function TokenStream(input) {
             value: id
         }
     }
-    
+
     /**
      * 
      * 
@@ -154,7 +154,7 @@ function TokenStream(input) {
                 escaped = false
             } else if (ch == '\\') {
                 escaped = true
-            // when meet end char
+                // when meet end char
             } else if (ch == end) {
                 break
             } else {
@@ -220,6 +220,118 @@ function TokenStream(input) {
 
     function eof() {
         return peek() == null
+    }
+
+    /**
+     * 
+     * This function will be invoked when the lambda keyword 
+     * has already been seen and “eaten” from the input, 
+     * so all it cares for is to parse the argument names;
+     * but they're in parentheses and delimited by commas.
+     * @returns lambda 
+     */
+    function parseLambda() {
+        return {
+            type: 'lambda',
+            vars: delimited('(', ')', ',', parseVarname),
+            body: parseExpression()
+        }
+    }
+
+    /**
+     * 
+     * delimited is a bit lower-level:
+     * @param {String} start 
+     * @param {String} stop 
+     * @param {String} separator 
+     * @param {function} parser 
+     */
+    function delimited(start, stop, separator, parser) {
+        let a = []
+        first = true
+        // skip the punctuation
+        skipPunc(start)
+        while (!input.eof()) {
+            if (ispunc) {
+                break
+            } else if (first) {
+                first = false
+            } else {
+                skipPunc(separator)
+            }
+            // the last separator can be missing
+            if (isPunc(stop)) {
+                break
+            }
+            a.push(parser())
+        }
+        skipPunc(stop)
+        return a
+    }
+
+    function parseToplevel() {
+        let prog = []
+        while (!input.eof()) {
+            prog.push(parseExpression())
+            if (!input.eof()) {
+                skipPunc(';')
+            }
+        }
+
+        return {
+            type: 'prog',
+            prog: prog
+        }
+    }
+
+    function parseIf() {
+        // this throws an error if the current token is not the given keyword
+        skipKeyward('if')
+        // parse the condition
+        let cond = parseExpression()
+        // if the consequent branch doesn't 
+        // start with a { we require the keyword then to be present
+        if (!isPunc("{")) {
+            skipKeyward('then')
+        }
+        let then = parseExpression()
+        let ret = {
+            type: 'if',
+            cond: cond,
+            then: then
+        }
+        // when there is a 'else'
+        if (isKeyword('else')) {
+            input.next()
+            ret.else = parseExpression()
+        }
+
+        return ret
+    }
+
+    /**
+     * parseAtom() does the main dispatching job, 
+     * depending on the current token:
+     * @return 
+     */
+    function parseAtom() {
+        return maybeCall(() => {
+            if(isPunc('(')){
+                input.next()
+                var expression = parseExpression()
+                skipPunc(')')
+                return expression
+            }
+            if(isPunc('{')){
+                return parseProg()
+            }
+            else if(isKeyword('if')){
+                return parseIf()
+            }
+            else if(isKeyword('true') || isKeyword('false')){
+                return parseBool()
+            }
+        })
     }
 }
 
