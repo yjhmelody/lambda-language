@@ -2,7 +2,7 @@
  * 
  * The character input stream
  * @param {string} input 
- * @returns inputstream
+ * @returns {Object} inputstream, can do something on one symbol
  */
 function InputStream(input) {
     let pos = 0
@@ -15,7 +15,10 @@ function InputStream(input) {
         eof,
         croak
     }
-
+    /**
+     * read next symbol 
+     * @returns 
+     */
     function next() {
         var ch = input.charAt(pos++)
         if (ch == '\n') {
@@ -26,29 +29,35 @@ function InputStream(input) {
         }
         return ch
     }
-
+    /**
+     * peek the symbol
+     * @returns {String}  
+     */
     function peek() {
         return input.charAt(pos)
     }
-
+    /**
+     * check if it is eof
+     * @returns {Boolean}
+     */
     function eof() {
-        return peek() == ''
+        return peek() === ''
     }
-
+    /**
+     * throw a error
+     * @param {any} msg 
+     */
     function croak(msg) {
         throw new Error(`${msg} (${line}:${col})`)
     }
 }
 
 
-
 /**
- * 
  * 
  * @param {InputStream} input 
  * @returns {Object}
  */
-
 function TokenStream(input) {
     //  we need a current variable which keeps track of the current token.    
     let current = null
@@ -223,6 +232,58 @@ function TokenStream(input) {
         return peek() == null
     }
 
+}
+
+
+// we're going to use the FALSE node in various places,
+// so I'm making it a global.
+let FALSE = {
+    type: "bool",
+    value: false
+}
+
+let TRUR = {
+    type: 'bool',
+    value: true
+}
+
+/**
+ * maybeBinary(left, my_prec) is used to compose 
+ * binary expressions like 1 + 2 * 3. The trick to 
+ * parse them properly is to correctly define 
+ * the operator precedence, so we'll start with that:
+ */
+let PRECEDENCE = {
+    "=": 1,
+    "||": 2,
+    "&&": 3,
+    "<": 7,
+    ">": 7,
+    "<=": 7,
+    ">=": 7,
+    "==": 7,
+    "!=": 7,
+    "+": 10,
+    "-": 10,
+    "*": 20,
+    "/": 20,
+    "%": 20,
+}
+
+/**
+ * 
+ * 
+ * @param {TokenStream} input 
+ * @returns {Object} ast
+ */
+function parse(input) {
+    return parseToplevel()
+
+    function isPunc(ch) {
+        let token = input.peek()
+        return token && token.type === 'punc' && (!ch || token.value === ch)
+    }
+
     /**
      * 
      * This function will be invoked when the lambda keyword 
@@ -347,12 +408,6 @@ function TokenStream(input) {
             unexpected()
         })
     }
-    // we're going to use the FALSE node in various places,
-    // so I'm making it a global.
-    var FALSE = {
-        type: "bool",
-        value: false
-    };
     //  It will do some minor optimization at this point — 
     // if the prog is empty, then it just returns FALSE. 
     // If it has a single expression, it is returned 
@@ -400,32 +455,12 @@ function TokenStream(input) {
     }
 
     /**
-     * maybeBinary(left, my_prec) is used to compose 
-     * binary expressions like 1 + 2 * 3. The trick to 
-     * parse them properly is to correctly define 
-     * the operator precedence, so we'll start with that:
-     */
-    let PRECEDENCE = {
-        "=": 1,
-        "||": 2,
-        "&&": 3,
-        "<": 7,
-        ">": 7,
-        "<=": 7,
-        ">=": 7,
-        "==": 7,
-        "!=": 7,
-        "+": 10,
-        "-": 10,
-        "*": 20,
-        "/": 20,
-        "%": 20,
-    }
-
-    /**
      * If it's an operator that has a higher precedence than ours, 
      * then it wraps left in a new "binary" node, and for the right 
      * side it repeats the trick at the new precedence level (*):
+     * 
+     * since myPrecedence is initially zero, any operator will trigger
+     * the building of a "binary" node (or "assign" when the operator is =)
      * @param {Object} left 
      * @param {Number} myPrecedence 
      */
@@ -436,8 +471,9 @@ function TokenStream(input) {
             // need to read more token
             if (hisPrecedence > myPrecedence) {
                 input.next()
-                // do the operation which is higher precedence
-                // after recursive finish, it is the right operand
+                // check whether the right operand is a binary operation
+                // firstly do the operation which is higher precedence
+                // after finishing recursive, it returns the right operand
                 let right = maybeBinary(parseAtom(), hisPrecedence) // (*)
                 let binary = {
                     type: token.value === '=' ? 'assign' : 'binary',
@@ -450,7 +486,6 @@ function TokenStream(input) {
         }
         return left
     }
-
 }
 
 
