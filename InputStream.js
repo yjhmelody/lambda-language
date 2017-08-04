@@ -6,7 +6,7 @@ module.exports = InputStream
  * 
  * The character input stream
  * @param {string} input 
- * @returns {Object} inputstream, can do something on one symbol
+ * @returns {Object} inputstream, can do something on one symbol; used by TokenStream
  */
 function InputStream(input) {
     let pos = 0

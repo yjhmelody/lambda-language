@@ -4,7 +4,7 @@ module.exports = TokenStream
 /**
  * 
  * @param {InputStream} input 
- * @returns {Object}
+ * @returns {Object} can parse token to object; used by parser
  */
 function TokenStream(input) {
     //  we need a current variable which keeps track of the current token.    
