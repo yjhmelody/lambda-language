@@ -149,7 +149,7 @@ function evaluate(expr, env) {
             // A "lambda" node will actually result in a JavaScript closure, 
             // so it will be callable from JavaScript just like an ordinary function. 
         case 'lambda':
-            return makeLambda(env, expr)
+            return makeLambda(expr, env)
 
             // Evaluating an "if" node is simple: first evaluate the condition.
             // If it's not false then evaluate the "then" branch and return its value.
@@ -224,6 +224,14 @@ function checkDiv(x) {
     return x
 }
 
+/**
+ * 
+ * 
+ * @param {String} op 
+ * @param {any} a 
+ * @param {any} b 
+ * @returns {any} operation result
+ */
 function applyOP(op, a, b) {
     switch (op) {
         case '+':
@@ -252,5 +260,48 @@ function applyOP(op, a, b) {
             return a === b
         case '!=':
             return a !== b
+        default:
+            throw new SyntaxError('cannot apply operator ' + op)
     }
 }
+
+/**
+ * As you can see, it returns a plain JavaScript function that 
+ * encloses over the environment and the expression to evaluate. 
+ * It's important to understand that nothing happens when this closure 
+ * is created — but when it's called, it will extend the environment 
+ * that it saved at creation time with the new bindings of arguments/values 
+ * (if less values are passed than the function's argument list, 
+ * the missing ones will get the value false). And then 
+ * it just evaluates the body in the new scope.
+ * @param {any} expr 
+ * @param {any} env 
+ * @return {function} lambda
+ */
+function makeLambda(expr, env) {
+    return lambda
+
+    function lambda() {
+        let names = expr.vars
+        let scope = env.extend()
+        for (let i = 0; i < names.length; i++) {
+            // some confusions
+            scope.def(names[i], i < arguments.length ? arguments[i] : false)
+        }
+        return evaluate(expr.body, scope)
+    }
+}
+
+// Primitive functions
+
+let code = 'sum = lambda(x, y) x + y; print(sum(2, 3));'
+
+let ast = parser(TokenStream(InputStream(code)))
+
+let globalEnv = new Environment()
+
+globalEnv.def('println', (txt) => {
+    console.log(txt)
+})
+
+evaluate(ast, globalEnv)

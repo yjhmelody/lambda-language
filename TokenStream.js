@@ -15,7 +15,7 @@ function TokenStream(input) {
         next,
         peek,
         eof,
-        croak
+        croak:input.croak
     }
 
     function isKeyword(ch) {
