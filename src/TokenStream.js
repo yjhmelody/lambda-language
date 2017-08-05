@@ -8,7 +8,7 @@ module.exports = TokenStream
 function TokenStream(input) {
     //  we need a current variable which keeps track of the current token.    
     let current = null
-    let keywords = ' if then else lambda λ true false '
+    let keywords = ' let if then else lambda λ true false '
 
     return {
         next,

@@ -24,6 +24,7 @@ class Environment {
     constructor(parent) {
         this.vars = Object.create(parent ? parent.vars : null)
         this.parent = parent
+        this.count = 0
     }
     /**
      * 
@@ -32,6 +33,8 @@ class Environment {
      * @memberof Environment
      */
     extend() {
+        // this.count++
+        // console.log(this.vars)
         return new Environment(this)
     }
     /**
@@ -150,6 +153,14 @@ function evaluate(expr, env) {
             // so it will be callable from JavaScript just like an ordinary function. 
         case 'lambda':
             return makeLambda(expr, env)
+
+        case 'let':
+            expr.vars.forEach((v) => {
+                let scope = env.extend()
+                scope.def(v.name, v.def ? evaluate(v.def, env) : false)
+                env = scope
+            })
+            return evaluate(expr.body, env)
 
             // Evaluating an "if" node is simple: first evaluate the condition.
             // If it's not false then evaluate the "then" branch and return its value.
@@ -284,7 +295,13 @@ function applyOP(op, a, b) {
  * @return {function} lambda
  */
 function makeLambda(expr, env) {
-    return lambda
+    // If the function name is present, then we extend 
+    // the scope right when the closure is created and define the name 
+    // to point to the newly created closure. The rest remains unchanged.
+    if (expr.name) {
+        env = env.extend()
+        env.def(expr.name, lambda)
+    }
 
     function lambda() {
         let names = expr.vars
@@ -295,6 +312,8 @@ function makeLambda(expr, env) {
         }
         return evaluate(expr.body, scope)
     }
+
+    return lambda
 }
 
 module.exports = Environment

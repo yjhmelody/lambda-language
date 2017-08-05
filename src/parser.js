@@ -97,7 +97,7 @@ function parser(input) {
      * @param {String} stop 
      * @param {String} separator 
      * @param {function} parser 
-     * @return {Array} a, store a series of tokens which returns by parser
+     * @return {Array} arr, store a series of tokens which returns by parser
      */
     function delimited(start, stop, separator, parser) {
         let arr = []
@@ -195,8 +195,11 @@ function parser(input) {
             if (isKeyword('true') || isKeyword('false')) {
                 return parseBool()
             }
+            if (isKeyword('let')){
+                return parseLet()
+            }
+            
             if (isKeyword('lambda') || isKeyword('λ')) {
-                input.next()
                 return parseLambda()
             }
 
@@ -251,10 +254,59 @@ function parser(input) {
      * @returns {Object} lambda ast 
      */
     function parseLambda() {
+        input.next()
         return {
             type: 'lambda',
+            // optional lambda name
+            name: input.peek().type === 'var' ? input.next() : null,
             vars: delimited('(', ')', ',', parseVarname),
             body: parseExpression()
+        }
+    }
+
+    /**
+     * 
+     * IIFE, optional name
+     *  The function's argument names are the variables 
+     * defined in let, and the "call" will take care to 
+     * send the values in args. And the body of the function is, 
+     * of course, fetched with parse_expression()
+     * @returns {Object} let ast
+     */
+    function parseLet() {
+        skipKeyward('let')
+        if (input.peek().type === 'var') {
+            let name = input.next().value
+            let defs = delimited('(', ')', ',', parseVardef)
+            return {
+                type: 'call',
+                func: {
+                    type: 'lambda',
+                    name: name,
+                    vars: defs.map(def => def.name),
+                    body: parseExpression()
+                },
+                args: defs.map(def => def.def || FALSE)
+            }
+        }
+        return {
+            type: 'let',
+            vars: delimited('(', ')', ',', parseVardef),
+            body: parseExpression()
+        }
+    }
+
+    function parseVardef() {
+        let name = parseVarname()
+        let def = null
+        if (isOp('=')) {
+            // skip the '='
+            input.next()
+            def = parseExpression()
+        }
+        return {
+            name,
+            def
         }
     }
 
@@ -312,7 +364,7 @@ function parser(input) {
      * If it has a single expression, it is returned 
      * instead of a "prog" node. Otherwise it returns
      * a "prog" node containing the expressions.
-     * @returns {Object} 
+     * @returns {Object} prog ast
      */
     function parseProg() {
         let prog = delimited('{', '}', ';', parseExpression)

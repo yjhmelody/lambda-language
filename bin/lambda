@@ -13,3 +13,4 @@ code = fs.readFileSync(args[2]).toString()
 ast = parser(TokenStream(InputStream(code)))
 
 env.evaluate(ast, env)
+// console.log('count', env.count)

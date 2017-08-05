@@ -16,10 +16,10 @@ globalEnv.def('println', (val) => {
 })
 
 register(globalEnv, console, 'console-')
-register(globalEnv, fs, 'fs-')
-register(globalEnv, util, 'util-')
-register(globalEnv, path, 'path-')
-register(globalEnv, os, 'os-')
+// register(globalEnv, fs, 'fs-')
+// register(globalEnv, util, 'util-')
+// register(globalEnv, path, 'path-')
+// register(globalEnv, os, 'os-')
 
 
 function register(env, obj, prefix = '') {
