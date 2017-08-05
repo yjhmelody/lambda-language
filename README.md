@@ -4,6 +4,16 @@
 
 ## The toy language is written by javascript(basic now)
 
+## install
+```
+npm install implement-a-pl
+```
+
+## run
+```
+bin/lambda  demo
+```
+
 ### example
 
 ```
