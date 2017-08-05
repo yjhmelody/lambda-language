@@ -178,6 +178,9 @@ function evaluate(expr, env) {
             // then we evaluate the args and apply that function.
         case 'call':
             let func = evaluate(expr.func, env)
+            if (typeof func !== 'function') {
+                throw new TypeError(func + ' is not a function')
+            }
             return func.apply(null, expr.args.map((arg) => {
                 return evaluate(arg, env)
             }))

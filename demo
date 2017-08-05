@@ -1,6 +1,3 @@
-
-
-
 print_range = λ(a, b) if a <= b {
                         println(a);
                         if a + 1 <= b {
@@ -26,4 +23,14 @@ println(car(cdr(cdr(cdr(cdr(x))))));  # 5
 code = fs-readFileSync("./demo");
 println(code);
 println(os-arch());
-println((1 << 1) == 2);
+println(1 << 1 + 2);
+println((lambda(a, b) {1;a + b})(1, 2));
+
+add = lambda(a, b){
+  1;
+# return the last expression
+  a + b
+};
+println(add(100, 133));
+
+NIL(cons(1,2))
