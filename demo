@@ -26,3 +26,4 @@ println(car(cdr(cdr(cdr(cdr(x))))));  # 5
 code = fs-readFileSync("./demo");
 println(code);
 println(os-arch());
+println((1 << 1) == 2);

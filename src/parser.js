@@ -29,6 +29,8 @@ let PRECEDENCE = {
     ">=": 7,
     "==": 7,
     "!=": 7,
+    "<<": 8,
+    ">>": 8,
     "+": 10,
     "-": 10,
     "*": 20,
@@ -60,7 +62,7 @@ function parser(input) {
     }
 
     function skipPunc(str) {
-        // bug: cannot Identity `;`
+        // !bug: cannot Identity `;`
         if (isPunc(str)) {
             input.next()
         } else {

@@ -114,7 +114,6 @@ Environment.prototype.evaluate = evaluate
 
 /**
  * 
- * 
  * @param {Object} expr 
  * @param {Environment} env 
  * @returns {any} expression result
@@ -188,8 +187,9 @@ function evaluate(expr, env) {
     }
 }
 
+// check* functions are used to check the value type 
+
 /**
- * 
  * 
  * @param {any} x 
  * @param {String} type 
@@ -204,7 +204,6 @@ function checkType(x, type) {
 
 /**
  * 
- * 
  * @param {any} x 
  * @returns {any} x
  */
@@ -213,7 +212,6 @@ function checkNumber(x) {
 }
 
 /**
- * 
  * 
  * @param {any} x 
  * @returns {any} x 
@@ -227,10 +225,9 @@ function checkDiv(x) {
 
 /**
  * 
- * 
  * @param {String} op 
  * @param {any} a 
- * @param {any} b 
+ * @param {any} b
  * @returns {any} operation result
  */
 function applyOP(op, a, b) {
@@ -257,6 +254,10 @@ function applyOP(op, a, b) {
             return checkNumber(a) <= checkNumber(b)
         case '>=':
             return checkNumber(a) >= checkNumber(b)
+        case '<<':
+            return checkNumber(a) << checkNumber(b)
+        case '>>':
+            return checkNumber(a) >> checkNumber(b)
         case '==':
             return a === b
         case '!=':
