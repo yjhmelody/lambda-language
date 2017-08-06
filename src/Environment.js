@@ -99,9 +99,6 @@ class Environment {
     }
 }
 
-Environment.evaluate = evaluate
-Environment.prototype.evaluate = evaluate
-
 
 // num { type: "num", value: NUMBER }
 // str { type: "str", value: STRING }
@@ -126,6 +123,7 @@ function evaluate(expr, env, callback) {
     if (typeof expr !== 'object') {
         throw new TypeError('the evaluate error!')
     }
+    GUARD(evaluate, arguments)
     switch (expr.type) {
         case 'num':
         case 'str':
@@ -145,14 +143,17 @@ function evaluate(expr, env, callback) {
                 throw TypeError('Cannot assign to ' + JSON.stringify(expr.left))
             }
             // recursive
-            evaluate(expr.right, env, (right) => {
+            evaluate(expr.right, env, function CC(right) {
+                GUARD(CC, arguments)
                 callback(env.set(expr.left.value, right))
             })
             return
 
         case 'binary':
-            evaluate(expr.left, env, (left) => {
-                evaluate(expr.right, env, (right) => {
+            evaluate(expr.left, env, function CC(left) {
+                GUARD(CC, arguments)
+                evaluate(expr.right, env, function CC(right) {
+                    GUARD(CC, arguments)
                     callback(applyOP(expr.operator, left, right))
                 })
             })
@@ -166,10 +167,12 @@ function evaluate(expr, env, callback) {
 
         case 'let':
             (function loop(env, i) {
+                GUARD(loop, arguments)
                 if (i < expr.vars.length) {
                     let v = expr.vars[i]
                     if (v.def) {
-                        evaluate(v.def, env, (value) => {
+                        evaluate(v.def, env, function CC(value) {
+                            GUARD(CC, arguments)
                             let scope = env.extend()
                             scope.def(v.name, value)
                             loop(scope, i + 1)
@@ -184,7 +187,8 @@ function evaluate(expr, env, callback) {
             // If it's not false then evaluate the "then" branch and return its value.
             // Otherwise, evaluate the "else" branch, if present, or return false.
         case 'if':
-            evaluate(expr.cond, env, (cond) => {
+            evaluate(expr.cond, env, function CC(cond) {
+                GUARD(CC, arguments)
                 if (cond !== false) {
                     evaluate(expr.then, env, callback)
                 } else if (expr.else) {
@@ -201,8 +205,10 @@ function evaluate(expr, env, callback) {
             // the return value is initialized to false.
         case 'prog':
             (function loop(last, i) {
+                GUARD(loop, arguments)
                 if (i < expr.prog.length) {
-                    evaluate(expr.prog[i], env, (value) => {
+                    evaluate(expr.prog[i], env, function CC(value) {
+                        GUARD(CC, arguments)
                         loop(value, i + 1)
                     })
                 } else {
@@ -211,21 +217,25 @@ function evaluate(expr, env, callback) {
 
             })(false, 0)
             return
+
             // For a "call" node we need to call a function. 
             // First we evaluate the func, which should return a normal JS function, 
             // then we evaluate the args and apply that function.
         case 'call':
-            evaluate(expr.func, env, (func) => {
-                (function loop(args, i) {
-                    if (i < expr.args.length) {
-                        evaluate(expr.args[i], env, (arg) => {
-                            args[i + 1] = arg
-                            loop(args, i + 1)
-                        })
-                    } else {
-                        func.apply(null, args)
-                    }
-                })([callback], 0)
+            evaluate(expr.func, env, function CC(func) {
+                // GUARD(CC, arguments)
+                    (function loop(args, i) {
+                        GUARD(loop, arguments)
+                        if (i < expr.args.length) {
+                            evaluate(expr.args[i], env, function CC(arg) {
+                                GUARD(CC, arguments)
+                                args[i + 1] = arg
+                                loop(args, i + 1)
+                            })
+                        } else {
+                            func(...args)
+                        }
+                    })([callback], 0)
             })
             return
 
@@ -337,16 +347,68 @@ function makeLambda(expr, env) {
     }
 
     function lambda(callback) {
+        GUARD(lambda, arguments)
         let names = expr.vars
         let scope = env.extend()
         for (let i = 0; i < names.length; i++) {
             // some confusions
-            scope.def(names[i], i+1 < arguments.length ? arguments[i+1] : false)
+            scope.def(names[i], i + 1 < arguments.length ? arguments[i + 1] : false)
         }
         evaluate(expr.body, scope, callback)
     }
     return lambda
 }
 
+var STACK_LEN 
+
+/**
+ * guard the stack
+ * 
+ * @param {any} func 
+ * @param {any} args, func's args
+ */
+function GUARD(func, args) {
+    // console.log(func)
+    if (--STACK_LEN < 0) {
+        throw new Continuation(func, args)
+    }
+}
+
+/**
+ * 
+ * pass func's args
+ * @param {any} func 
+ * @param {any} args 
+ */
+function Continuation(func, args) {
+    this.func = func
+    this.args = args
+}
+
+/**
+ * 
+ * execute function with guarding stack
+ * @param {any} func 
+ * @param {any} args 
+ */
+function Execute(func, args) {
+    for (;;) {
+        try {
+            STACK_LEN = 200
+            return func(...args)
+        } catch (err) {
+            if (err instanceof Continuation) {
+                func = err.func
+                args = err.args
+
+            } else {
+                throw err
+            }
+        }
+    }
+}
+
+Environment.evaluate = evaluate
+Environment.Execute = Execute
 module.exports = Environment
 // Primitive functions

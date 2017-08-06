@@ -179,7 +179,7 @@ function parser(input) {
      */
     function parseAtom() {
 
-        return maybeCall(() => {
+        return maybeCall(function () {
             if (isPunc('(')) {
                 input.next()
                 let expression = parseExpression()
@@ -195,10 +195,10 @@ function parser(input) {
             if (isKeyword('true') || isKeyword('false')) {
                 return parseBool()
             }
-            if (isKeyword('let')){
+            if (isKeyword('let')) {
                 return parseLet()
             }
-            
+
             if (isKeyword('lambda') || isKeyword('λ')) {
                 return parseLambda()
             }
@@ -230,7 +230,9 @@ function parser(input) {
      * @return {Object} ast
      */
     function parseExpression() {
-        return maybeCall(() => maybeBinary(parseAtom(), 0))
+        return maybeCall(function () {
+            return maybeBinary(parseAtom(), 0)
+        })
     }
 
     /**
@@ -283,10 +285,14 @@ function parser(input) {
                 func: {
                     type: 'lambda',
                     name: name,
-                    vars: defs.map(def => def.name),
+                    vars: defs.map(function (def) {
+                        return def.name
+                    }),
                     body: parseExpression()
                 },
-                args: defs.map(def => def.def || FALSE)
+                args: defs.map(function (def) {
+                    return def.def || FALSE
+                })
             }
         }
         return {
