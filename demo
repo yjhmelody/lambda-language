@@ -93,3 +93,6 @@ let (x = 10) {
   };
   println(x);  ## 10
 };
+
+fib = λ(n) if n < 2 then n else fib(n - 1) + fib(n - 2);
+println(fib(22))

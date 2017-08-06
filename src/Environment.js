@@ -128,12 +128,14 @@ function evaluate(expr, env, callback) {
         case 'num':
         case 'str':
         case 'bool':
-            return callback(expr.value)
+            callback(expr.value)
+            return
 
             // Variables are fetched from the environment. Remember 
             // that "var" tokens contain the name in the value property
         case 'var':
-            return callback(env.get(expr.value))
+            callback(env.get(expr.value))
+            return
 
             // For assignment, we need to check if the left side is a "var" token
             // Then we use env.set to set the value. Note that the value 
@@ -224,23 +226,23 @@ function evaluate(expr, env, callback) {
         case 'call':
             evaluate(expr.func, env, function CC(func) {
                 // GUARD(CC, arguments)
-                    (function loop(args, i) {
-                        GUARD(loop, arguments)
-                        if (i < expr.args.length) {
-                            evaluate(expr.args[i], env, function CC(arg) {
-                                GUARD(CC, arguments)
-                                args[i + 1] = arg
-                                loop(args, i + 1)
-                            })
-                        } else {
-                            func(...args)
-                        }
-                    })([callback], 0)
+                (function loop(args, i) {
+                    GUARD(loop, arguments)
+                    if (i < expr.args.length) {
+                        evaluate(expr.args[i], env, function CC(arg) {
+                            GUARD(CC, arguments)
+                            args[i + 1] = arg
+                            loop(args, i + 1)
+                        })
+                    } else {
+                        func(...args)
+                    }
+                })([callback], 0)
             })
             return
 
         default:
-            throw new SyntaxError('I do not know how to evaluate ' + exp.type)
+            throw new SyntaxError('I do not know how to evaluate ' + expr.type)
     }
 }
 
@@ -359,7 +361,7 @@ function makeLambda(expr, env) {
     return lambda
 }
 
-var STACK_LEN 
+var STACK_LEN
 
 /**
  * guard the stack
@@ -400,7 +402,6 @@ function Execute(func, args) {
             if (err instanceof Continuation) {
                 func = err.func
                 args = err.args
-
             } else {
                 throw err
             }

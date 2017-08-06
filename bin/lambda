@@ -14,5 +14,5 @@ ast = parser(TokenStream(InputStream(code)))
 
 Environment.Execute(Environment.evaluate, [ast, env, function (result) {
     // the result of the entire program is now in "result"
-    console.log('result', result)
+    // console.log('result', result)
 }])
