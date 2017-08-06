@@ -12,5 +12,7 @@ let args = process.argv
 code = fs.readFileSync(args[2]).toString()
 ast = parser(TokenStream(InputStream(code)))
 
-env.evaluate(ast, env)
-// console.log('count', env.count)
+env.evaluate(ast, env, function(result){
+    // the result of the entire program is now in "result"
+    console.log('result', result)
+})

@@ -119,9 +119,10 @@ Environment.prototype.evaluate = evaluate
  * 
  * @param {Object} expr 
  * @param {Environment} env 
+ * @param {function} callback
  * @returns {any} expression result
  */
-function evaluate(expr, env) {
+function evaluate(expr, env, callback) {
     if (typeof expr !== 'object') {
         throw new TypeError('the evaluate error!')
     }
@@ -129,12 +130,12 @@ function evaluate(expr, env) {
         case 'num':
         case 'str':
         case 'bool':
-            return expr.value
+            return callback(expr.value)
 
             // Variables are fetched from the environment. Remember 
             // that "var" tokens contain the name in the value property
         case 'var':
-            return env.get(expr.value)
+            return callback(env.get(expr.value))
 
             // For assignment, we need to check if the left side is a "var" token
             // Then we use env.set to set the value. Note that the value 
@@ -144,57 +145,89 @@ function evaluate(expr, env) {
                 throw TypeError('Cannot assign to ' + JSON.stringify(expr.left))
             }
             // recursive
-            return env.set(expr.left.value, evaluate(expr.right, env))
+            evaluate(expr.right, env, (right) => {
+                callback(env.set(expr.left.value, right))
+            })
+            return
 
         case 'binary':
-            return applyOP(expr.operator, evaluate(expr.left, env), evaluate(expr.right, env))
+            evaluate(expr.left, env, (left) => {
+                evaluate(expr.right, env, (right) => {
+                    callback(applyOP(expr.operator, left, right))
+                })
+            })
+            return
 
             // A "lambda" node will actually result in a JavaScript closure, 
             // so it will be callable from JavaScript just like an ordinary function. 
         case 'lambda':
-            return makeLambda(expr, env)
+            callback(makeLambda(expr, env))
+            return
 
         case 'let':
-            expr.vars.forEach((v) => {
-                let scope = env.extend()
-                scope.def(v.name, v.def ? evaluate(v.def, env) : false)
-                env = scope
-            })
-            return evaluate(expr.body, env)
-
+            (function loop(env, i) {
+                if (i < expr.vars.length) {
+                    let v = expr.vars[i]
+                    if (v.def) {
+                        evaluate(v.def, env, (value) => {
+                            let scope = env.extend()
+                            scope.def(v.name, value)
+                            loop(scope, i + 1)
+                        })
+                    }
+                } else {
+                    evaluate(expr.body, env, callback)
+                }
+            })(env, 0)
+            return
             // Evaluating an "if" node is simple: first evaluate the condition.
             // If it's not false then evaluate the "then" branch and return its value.
             // Otherwise, evaluate the "else" branch, if present, or return false.
         case 'if':
-            let cond = evaluate(expr.cond, env)
-            if (cond) {
-                return evaluate(expr.then, env)
-            } else {
-                return expr.else ? evaluate(expr.else, env) : false
-            }
+            evaluate(expr.cond, env, (cond) => {
+                if (cond !== false) {
+                    evaluate(expr.then, env, callback)
+                } else if (expr.else) {
+                    evaluate(expr.else, env, callback)
+                } else {
+                    callback(false)
+                }
+            })
+            return
 
             // A "prog" is a sequence of expressions. 
             // We just evaluate them in order and return 
             // the value of the last one. For an empty sequence, 
             // the return value is initialized to false.
         case 'prog':
-            let val = false
-            expr.prog.forEach((expr) => {
-                val = evaluate(expr, env)
-            })
-            return val
+            (function loop(last, i) {
+                if (i < expr.prog.length) {
+                    evaluate(expr.prog[i], env, (value) => {
+                        loop(value, i + 1)
+                    })
+                } else {
+                    callback(last)
+                }
 
+            })(false, 0)
+            return
             // For a "call" node we need to call a function. 
             // First we evaluate the func, which should return a normal JS function, 
             // then we evaluate the args and apply that function.
         case 'call':
-            let func = evaluate(expr.func, env)
-            if (typeof func !== 'function') {
-                throw new TypeError(func + ' is not a function')
-            }
-            return func.apply(null, expr.args.map((arg) => {
-                return evaluate(arg, env)
-            }))
+            evaluate(expr.func, env, (func) => {
+                (function loop(args, i) {
+                    if (i < expr.args.length) {
+                        evaluate(expr.args[i], env, (arg) => {
+                            args[i + 1] = arg
+                            loop(args, i + 1)
+                        })
+                    } else {
+                        func.apply(null, args)
+                    }
+                })([callback], 0)
+            })
+            return
 
         default:
             throw new SyntaxError('I do not know how to evaluate ' + exp.type)
@@ -303,16 +336,15 @@ function makeLambda(expr, env) {
         env.def(expr.name, lambda)
     }
 
-    function lambda() {
+    function lambda(callback) {
         let names = expr.vars
         let scope = env.extend()
         for (let i = 0; i < names.length; i++) {
             // some confusions
-            scope.def(names[i], i < arguments.length ? arguments[i] : false)
+            scope.def(names[i], i+1 < arguments.length ? arguments[i+1] : false)
         }
-        return evaluate(expr.body, scope)
+        evaluate(expr.body, scope, callback)
     }
-
     return lambda
 }
 
