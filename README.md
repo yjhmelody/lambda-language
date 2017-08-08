@@ -15,10 +15,10 @@ ref the [example](./bin/lambda)
 ## API
 * InputStream: output lex
 * TokenStream: output token
-* parser: ast
+* parser: output ast
 * Environment: store variables
-* Environment.Execute: execute ast with an environment
-* Environment.evalute: eval ast expression
+* Environment.Execute: execute ast with guarding stack 
+* Environment.evalute: eval ast expression with an env
 
 
 ## run
