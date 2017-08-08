@@ -9,6 +9,18 @@
 npm install implement-a-pl
 ```
 
+## usage
+ref the [example](./bin/lambda)
+
+## API
+* InputStream: output lex
+* TokenStream: output token
+* parser: ast
+* Environment: store variables
+* Environment.Execute: execute ast with an environment
+* Environment.evalute: eval ast expression
+
+
 ## run
 ```
 bin/lambda  demo
