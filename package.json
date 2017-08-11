@@ -4,7 +4,7 @@
   "description": "compiler",
   "main": "index.js",
   "scripts": {
-    "test": "node ./bin/lambda ./demo"
+    "test": ""
   },
   "keywords": [
     "compiler"

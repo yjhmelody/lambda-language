@@ -38,7 +38,7 @@ bin/lambda  demo
 ## complier the language to JS
 
 ```
-bin/code-to-js demo2
+bin/code-to-js demo2 [demo2.js]
 ```
 
 ### example about syntax
