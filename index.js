@@ -4,6 +4,8 @@ let InputStream = require('./src/InputStream')
 let TokenStream = require('./src/TokenStream')
 let parser = require('./src/parser')
 let Environment = require('./src/Environment')
+let makejs = require('./src/codeGen')
+
 let Execute = Environment.Execute
 let evalute = Environment.evalute
 

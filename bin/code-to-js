@@ -10,10 +10,9 @@ const fs = require('fs')
 
 let args = process.argv
 
-if(args.length === 2){
+if (args.length === 2) {
     throw Error('need src and target')
-}
-else if(args.length === 3){
+} else if (args.length === 3) {
     args.push('./' + args[2] + '.js')
 }
 

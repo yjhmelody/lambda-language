@@ -1,31 +1,42 @@
 # lambda-language
 
-## ref: http://lisperator.net/pltut/eval1/play
+## reference
+
+[blog](http://lisperator.net/pltut/eval1/play)
 
 ## The toy language is written by javascript(basic now)
 
 ## install
+
 ```
 npm install implement-a-pl
 ```
 
 ## syntax
+
 ref the [example](./bin/lambda)
 
 ## API
+
+The following are located in the corresponding file in `src`
+
 * InputStream: output lex
 * TokenStream: output token
 * parser: output ast
+* codeGen: complier the ast to JS
 * Environment: store variables
 * Environment.Execute: execute ast with guarding stack 
 * Environment.evalute: eval ast expression with an env
 
 
-## run the language 
+## run the language
+
 ```
 bin/lambda  demo
 ```
+
 ## complier the language to JS
+
 ```
 bin/code-to-js demo2
 ```
@@ -43,7 +54,9 @@ print_range = λ(a, b) if a <= b {
                       };
 print_range(1, 10);
 ```
+
 output:
+
 ```
 1
 2
@@ -71,7 +84,9 @@ println(car(cdr(cdr(x))));            # 3
 println(car(cdr(cdr(cdr(x)))));       # 4
 println(car(cdr(cdr(cdr(cdr(x))))));  # 5
 ```
+
 output:
+
 ```
 1
 2
