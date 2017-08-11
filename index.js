@@ -42,11 +42,12 @@ globalEnv.def("writeFile", function (k, filename, data) {
 })
 
 globalEnv.def("twice", function (k, a, b) {
-    console.log('1!!!!!', a)
+    // console.log('1!!!!!', a)
     k(a)
-    console.log('2!!!!!', b)    
+    // console.log('2!!!!!', b)
     k(b)
 })
+
 
 
 module.exports = globalEnv

@@ -1,0 +1,25 @@
+#!/usr/bin/env node
+
+let InputStream = require('../src/InputStream')
+let TokenStream = require('../src/TokenStream')
+let parser = require('../src/parser')
+let makejs = require('../src/codeGen')
+let env = require('../index')
+
+const fs = require('fs')
+
+let args = process.argv
+
+if(args.length === 2){
+    throw Error('need src and target')
+}
+else if(args.length === 3){
+    args.push('./' + args[2] + '.js')
+}
+
+code = fs.readFileSync(args[2]).toString('utf-8')
+
+ast = parser(TokenStream(InputStream(code)))
+let jsCode = makejs(ast)
+
+fs.writeFileSync(args[3], jsCode, 'utf-8')

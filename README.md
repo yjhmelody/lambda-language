@@ -9,7 +9,7 @@
 npm install implement-a-pl
 ```
 
-## usage
+## syntax
 ref the [example](./bin/lambda)
 
 ## API
@@ -21,12 +21,16 @@ ref the [example](./bin/lambda)
 * Environment.evalute: eval ast expression with an env
 
 
-## run
+## run the language 
 ```
 bin/lambda  demo
 ```
+## complier the language to JS
+```
+bin/code-to-js demo2
+```
 
-### example
+### example about syntax
 
 ```
 print_range = λ(a, b) if a <= b {
