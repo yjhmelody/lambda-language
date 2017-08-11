@@ -1,14 +1,24 @@
 {
   "name": "implement-a-pl",
-  "version": "0.3.0",
-  "description": "compiler",
-  "main": "index.js",
+  "version": "0.3.1",
+  "description": "compiler and inpterpreter for study",
+  "main": "bin/lambda",
   "scripts": {
     "test": ""
   },
   "keywords": [
-    "compiler"
+    "compiler",
+    "interpreter",
+    "for study"
   ],
   "author": "yjhmelody",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yjhmelody/lambda-language.git"
+  },
+  "homepage": "https://github.com/yjhmelody/lambda-language",
+  "bugs": {
+    "url": "https://github.com/yjhmelody/lambda-language/issues"
+  }
 }

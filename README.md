@@ -1,5 +1,7 @@
 # lambda-language
 
+just for study
+
 ## reference
 
 [blog](http://lisperator.net/pltut/eval1/play)
