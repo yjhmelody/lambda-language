@@ -2,6 +2,12 @@
 [![complier](https://img.shields.io/badge/lambda--langugage-complier-blue.svg)](https://github.com/yjhmelody/lambda-language)
 [![version](https://img.shields.io/badge/version-0.3.1-blue.svg)](https://github.com/yjhmelody/lambda-language)
 [![npm](https://img.shields.io/npm/dm/lambda-language.svg)](https://www.npmjs.com/package/lambda-language)
+[![NPM Version][npm-image]][npm-url]
+[![NPM Downloads][downloads-image]][downloads-url]
+[![Linux Build][travis-image]][travis-url]
+[![Windows Build][appveyor-image]][appveyor-url]
+[![Test Coverage][coveralls-image]][coveralls-url]
+
 
 ---
 It just was written for study
