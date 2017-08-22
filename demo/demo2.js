@@ -1,1 +1,1 @@
-((sum=(function (x, y) {return (x+y)})),print(sum(2,3)))
+((a=foo()),(b=bar()),(c=baz()))

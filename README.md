@@ -2,6 +2,8 @@
 
 just for study
 
+[![version](https://img.shields.io/badge/lambda--langugage-0.3.1-blue.svg)]()
+[![complier](https://img.shields.io/badge/lambda--langugage-complier-blue.svg)]()
 ## reference
 
 [blog](http://lisperator.net/pltut/eval1/play)

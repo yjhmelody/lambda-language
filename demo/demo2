@@ -1,1 +1,4 @@
-sum = lambda(x, y) x + y; print(sum(2, 3));
+# sum = lambda(x, y) x + y; print(sum(2, 3));
+a = foo();
+b = bar();
+c = baz();
