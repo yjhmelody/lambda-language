@@ -1,5 +1,5 @@
 {
-  "name": "implement-a-pl",
+  "name": "lambda-language",
   "version": "0.3.1",
   "description": "compiler and inpterpreter for study",
   "main": "bin/lambda",
