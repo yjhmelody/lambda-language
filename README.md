@@ -1,10 +1,10 @@
 # lambda-language
 [![complier](https://img.shields.io/badge/lambda--langugage-complier-blue.svg)](https://github.com/yjhmelody/lambda-language)
-[![](https://img.shields.io/badge/version-0.3.1-blue.svg)](https://github.com/yjhmelody/lambda-language)
-[![npm](https://img.shields.io/npm/dm/implement-a-pl.svg)](https://www.npmjs.com/package/implement-a-pl)
+[![version](https://img.shields.io/badge/version-0.3.1-blue.svg)](https://github.com/yjhmelody/lambda-language)
+[![npm](https://img.shields.io/npm/dm/lambda-language.svg)](https://www.npmjs.com/package/lambda-language)
 
 ---
-just for study
+It just was written for study
 
 ## reference
 
@@ -15,7 +15,7 @@ just for study
 ## install
 
 ```
-npm install implement-a-pl
+npm install lambda-language
 ```
 
 ## syntax
