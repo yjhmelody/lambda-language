@@ -22,11 +22,6 @@ println(car(cdr(cdr(x))));            # 3
 println(car(cdr(cdr(cdr(x)))));       # 4
 println(car(cdr(cdr(cdr(cdr(x))))));  # 5
 
-
-# code = fs-readFileSync("./demo");
-# println(code);
-# println(os-arch());
-
 add = lambda(a, b){
   1;
 # return the last expression
@@ -65,7 +60,7 @@ NIL = cons(0, 0);
 set-car!(NIL, NIL);
 set-cdr!(NIL, NIL);
 
-## test:
+# test:
 x = cons(1, 2);
 println(car(x));
 println(cdr(x));
@@ -105,3 +100,22 @@ copyFile("demo", "demo2");
 
 println(1 + twice(2, 3));
 
+# an implementation for return
+foo = lambda(return){
+  println("foo");
+  return("done");
+  println("bar");
+};
+
+CallCC(foo);
+
+# wrap CallCC
+with-return = lambda(f) lambda()CallCC(f);
+
+foo = with-return(lambda(return){
+  println("foo2");
+  return("done2");
+  println("bar2");
+});
+
+foo();
