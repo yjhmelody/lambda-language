@@ -12,7 +12,7 @@ let TRUE = {
     value: true
 }
 
-/**
+/*
  * 
  * maybeBinary(left, my_prec) is used to compose 
  * binary expressions like 1 + 2 * 3. The trick to 
@@ -40,7 +40,7 @@ let PRECEDENCE = {
 
 /**
  * 
- * @param {TokenStream} input, operate tokens 
+ * @param {TokenStream} input operate tokens 
  * @returns {Object} ast
  */
 function parser(input) {
@@ -128,7 +128,7 @@ function parser(input) {
      * These `maybe*` functions check what follows after 
      * an expression in order to decide whether to wrap 
      * that expression in another node, or just return it as is.
-     * @param {function} expression 
+     * @param {function} expression which will parse
      * @returns {Object} ast
      */
     function maybeCall(expression) {
@@ -213,7 +213,7 @@ function parser(input) {
 
     /**
      * 
-     * @returns {Object} bool ast 
+     * @returns {Object} bool ast
      */
     function parseBool() {
         return {
@@ -337,7 +337,7 @@ function parser(input) {
 
     /**
      * 
-     * @returns {Object} if ast
+     * @returns {Object} if epxression ast
      */
     function parseIf() {
         // this throws an error if the current token is not the given keyword
@@ -388,7 +388,7 @@ function parser(input) {
 
     /**
      * 
-     * @param {any} func 
+     * @param {any} func which is called
      * @returns {Object} call ast 
      */
     function parseCall(func) {

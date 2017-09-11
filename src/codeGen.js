@@ -3,7 +3,12 @@ let FALSE = {
     value: false
 }
 
-
+/**
+ * 
+ * 
+ * @param {any} expr expression ast 
+ * @returns string with js code 
+ */
 function makejs(expr) {
     return js(expr)
 
@@ -88,11 +93,11 @@ function makejs(expr) {
         return '(' + js(expr.cond) + ' !== false' + '?' + js(expr.then) + ':' + js(expr.else || FALSE) + ')'
     }
 
-    function jsProg(expr){
+    function jsProg(expr) {
         return '(' + expr.prog.map(js).join(',') + ')'
     }
 
-    function jsCall(expr){
+    function jsCall(expr) {
         return js(expr.func) + '(' + expr.args.map(js).join(',') + ')'
     }
 }

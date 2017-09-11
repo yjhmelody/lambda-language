@@ -18,7 +18,7 @@ let parser = require('./parser')
 class Environment {
     /**
      * Creates an instance of Environment.
-     * @param {Object | Environment} parent 
+     * @param {Object | Environment} parent extended env
      * @memberof Environment
      */
     constructor(parent) {
@@ -365,8 +365,8 @@ function GUARD(func, args) {
 /**
  * 
  * pass func's args
- * @param {function} func 
- * @param {Array} args 
+ * @param {function} func which will be passed
+ * @param {Array} args func's arguments
  */
 function Continuation(func, args) {
     this.func = func
@@ -376,8 +376,8 @@ function Continuation(func, args) {
 /**
  * 
  * execute function with guarding stack
- * @param {function} func 
- * @param {Array} args 
+ * @param {function} func which will be called
+ * @param {Array} args func's arguments
  */
 function Execute(func, args) {
     for (;;) {

@@ -2,9 +2,9 @@ module.exports = InputStream
 
 /**
  * 
- * The character input stream
- * @param {String} input 
- * @returns {Object} inputstream, can do something on one symbol; used by TokenStream
+ * The character input stream, can do something on one char
+ * @param {String} input code string
+ * @returns {Object} inputstream used by TokenStream
  */
 function InputStream(input) {
     let pos = 0
@@ -19,8 +19,8 @@ function InputStream(input) {
     }
     /**
      * 
-     * read next symbol 
-     * @returns {String} ch
+     * read next char 
+     * @returns {String} next char
      */
     function next() {
         let ch = input.charAt(pos++)
@@ -34,7 +34,7 @@ function InputStream(input) {
     }
     /**
      * 
-     * peek the symbol
+     * peek the char
      * @returns {String}  
      */
     function peek() {
@@ -43,7 +43,7 @@ function InputStream(input) {
     /**
      * 
      * check if it is eof
-     * @returns {Boolean}
+     * @returns {Boolean} isEof
      */
     function eof() {
         return peek() == ''
@@ -51,7 +51,7 @@ function InputStream(input) {
     /**
      * 
      * throw a error
-     * @param {any} msg 
+     * @param {any} msg error infomation
      */
     function croak(msg) {
         throw new Error(`${msg} (${line}:${col})`)

@@ -2,8 +2,8 @@ module.exports = TokenStream
 
 /**
  * 
- * @param {InputStream} input 
- * @returns {Object} can parse token to object; used by parser
+ * @param {InputStream} input which has deal with byte
+ * @returns {Object} which can parse token to object; used by parser
  */
 function TokenStream(input) {
     //  we need a current variable which keeps track of the current token.    
@@ -57,7 +57,7 @@ function TokenStream(input) {
         // warming: debug
         // console.log('peek', input.peek())
         // console.log('pred', predicate)
-        
+
         while (!input.eof() && predicate(input.peek())) {
             str += input.next()
         }
@@ -65,7 +65,7 @@ function TokenStream(input) {
         return str
     }
 
-    /**
+    /*
      * 
      * We only support decimal numbers with the usual notation 
      * (no 1E5 stuff, no hex, no octal). But if we ever need more, 
@@ -142,7 +142,7 @@ function TokenStream(input) {
     /**
      * 
      * read and check the next token 
-     * @returns {Object} ast 
+     * @returns {Object} ast
      */
     function readNext() {
         readWhile(isWhitespace)
@@ -201,7 +201,7 @@ function TokenStream(input) {
     }
 
     /**
-     * check eof 
+     * check eof
      * @returns {Boolean}
      */
     function eof() {
