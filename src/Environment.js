@@ -29,19 +29,17 @@ class Environment {
     /**
      * 
      * to create a subscope
-     * @returns {Environment} 
+     * @returns {Environment} extended env
      * @memberof Environment
      */
     extend() {
-        // this.count++
-        // console.log(this.vars)
         return new Environment(this)
     }
     /**
      * 
      * to find the scope where the variable
      * with the given name is defined
-     * @param {String} name 
+     * @param {String} name variable
      * @returns {Environment} scope 
      * @memberof Environment
      */
@@ -58,7 +56,7 @@ class Environment {
     /**
      * 
      * to get the current value of a variable
-     * @param {String} name 
+     * @param {String} name variable
      * @returns {any} value
      * @memberof Environment
      */
@@ -72,8 +70,8 @@ class Environment {
      * 
      * to set the value of a variable. This needs to lookup 
      * the actual scope where the variable is defined.
-     * @param {String} name 
-     * @param {any} value 
+     * @param {String} name varaible
+     * @param {any} value vraible's value
      * @returns {any} value 
      * @memberof Environment
      */
@@ -99,24 +97,11 @@ class Environment {
     }
 }
 
-
-// num { type: "num", value: NUMBER }
-// str { type: "str", value: STRING }
-// bool { type: "bool", value: true or false }
-// var { type: "var", value: NAME }
-// lambda { type: "lambda", vars: [ NAME... ], body: AST }
-// call { type: "call", func: AST, args: [ AST... ] }
-// if { type: "if", cond: AST, then: AST, else: AST }
-// assign { type: "assign", operator: "=", left: AST, right: AST }
-// binary { type: "binary", operator: OPERATOR, left: AST, right: AST }
-// prog { type: "prog", prog: [ AST... ] }
-// let { type: "let", vars: [ VARS... ], body: AST }
-
 /**
  * 
- * @param {Object} expr 
- * @param {Environment} env 
- * @param {function} callback
+ * @param {Object} expr expression ast
+ * @param {Environment} env runtime context
+ * @param {function} callback pass to another
  * @returns {any} expression result
  */
 function evaluate(expr, env, callback) {
@@ -185,6 +170,7 @@ function evaluate(expr, env, callback) {
                 }
             })(env, 0)
             return
+
             // Evaluating an "if" node is simple: first evaluate the condition.
             // If it's not false then evaluate the "then" branch and return its value.
             // Otherwise, evaluate the "else" branch, if present, or return false.
@@ -250,8 +236,8 @@ function evaluate(expr, env, callback) {
 
 /**
  * check x whether is expected type
- * @param {any} x 
- * @param {String} type 
+ * @param {any} x primitive value
+ * @param {String} type primitive type
  * @returns {any} x
  */
 function checkType(x, type) {
@@ -263,7 +249,7 @@ function checkType(x, type) {
 
 /**
  * 
- * @param {any} x 
+ * @param {any} x (expected) Number type
  * @returns {any} x
  */
 function checkNumber(x) {
@@ -272,7 +258,7 @@ function checkNumber(x) {
 
 /**
  * 
- * @param {any} x 
+ * @param {any} x (expected) non-zero number
  * @returns {any} x 
  */
 function checkDiv(x) {
@@ -284,9 +270,9 @@ function checkDiv(x) {
 
 /**
  * 
- * @param {String} op 
- * @param {any} a 
- * @param {any} b
+ * @param {String} op operation string
+ * @param {any} a op1
+ * @param {any} b op2
  * @returns {any} operation result
  */
 function applyOP(op, a, b) {
@@ -335,8 +321,8 @@ function applyOP(op, a, b) {
  * (if less values are passed than the function's argument list, 
  * the missing ones will get the value false). And then 
  * it just evaluates the body in the new scope.
- * @param {any} expr 
- * @param {any} env 
+ * @param {any} expr expression ast
+ * @param {any} env runtime context
  * @return {function} lambda
  */
 function makeLambda(expr, env) {
@@ -364,10 +350,10 @@ function makeLambda(expr, env) {
 var STACK_LEN
 
 /**
- * guard the stack
  * 
- * @param {any} func 
- * @param {any} args - func's args
+ * guard the stack
+ * @param {function} func which need to be guarded
+ * @param {Array} args func's args
  */
 function GUARD(func, args) {
     // console.log(func)
@@ -379,8 +365,8 @@ function GUARD(func, args) {
 /**
  * 
  * pass func's args
- * @param {any} func 
- * @param {any} args 
+ * @param {function} func 
+ * @param {Array} args 
  */
 function Continuation(func, args) {
     this.func = func
@@ -390,8 +376,8 @@ function Continuation(func, args) {
 /**
  * 
  * execute function with guarding stack
- * @param {any} func 
- * @param {any} args 
+ * @param {function} func 
+ * @param {Array} args 
  */
 function Execute(func, args) {
     for (;;) {
