@@ -1,6 +1,6 @@
 # lambda-language
 [![complier](https://img.shields.io/badge/lambda--langugage-complier-blue.svg)](https://github.com/yjhmelody/lambda-language)
-[![version](https://img.shields.io/badge/version-0.3.1-blue.svg)](https://github.com/yjhmelody/lambda-language)
+[![version](https://img.shields.io/badge/version-0.3.3-blue.svg)](https://github.com/yjhmelody/lambda-language)
 [![npm](https://img.shields.io/npm/dm/lambda-language.svg)](https://www.npmjs.com/package/lambda-language)
 
 

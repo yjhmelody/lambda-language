@@ -20,5 +20,8 @@
   "homepage": "https://github.com/yjhmelody/lambda-language",
   "bugs": {
     "url": "https://github.com/yjhmelody/lambda-language/issues"
+  },
+  "devDependencies": {
+    "jsdoc": "^3.5.4"
   }
 }

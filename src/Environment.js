@@ -87,9 +87,9 @@ class Environment {
     }
     /**
      * 
-     * this creates (or shadows, or overwrites) a variable in the current scope
-     * @param {String} name 
-     * @param {any} value 
+     * this function creates (or shadows, or overwrites) a variable in the current scope
+     * @param {String} name variable
+     * @param {any} value variable's value
      * @returns {any} value
      * @memberof Environment
      */
@@ -249,7 +249,7 @@ function evaluate(expr, env, callback) {
 // check* functions are used to check the value type 
 
 /**
- * 
+ * check x whether is expected type
  * @param {any} x 
  * @param {String} type 
  * @returns {any} x
@@ -367,7 +367,7 @@ var STACK_LEN
  * guard the stack
  * 
  * @param {any} func 
- * @param {any} args, func's args
+ * @param {any} args - func's args
  */
 function GUARD(func, args) {
     // console.log(func)
