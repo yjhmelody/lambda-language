@@ -1,4 +1,32 @@
-let InputStream = require('./InputStream')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Environment.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Environment.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>let InputStream = require('./InputStream')
 let TokenStream = require('./TokenStream')
 let parser = require('./parser')
 
@@ -78,7 +106,7 @@ class Environment {
     set(name, value) {
         let scope = this.lookup(name)
         // let's not allow defining globals from a nested environment
-        if (!scope && this.parent) {
+        if (!scope &amp;&amp; this.parent) {
             throw new ReferenceError('Undefined variable ' + name)
         }
         return (scope || this).vars[name] = value
@@ -155,7 +183,7 @@ function evaluate(expr, env, callback) {
         case 'let':
             (function loop(env, i) {
                 GUARD(loop, arguments)
-                if (i < expr.vars.length) {
+                if (i &lt; expr.vars.length) {
                     let v = expr.vars[i]
                     if (v.def) {
                         evaluate(v.def, env, function CC(value) {
@@ -194,7 +222,7 @@ function evaluate(expr, env, callback) {
         case 'prog':
             (function loop(last, i) {
                 GUARD(loop, arguments)
-                if (i < expr.prog.length) {
+                if (i &lt; expr.prog.length) {
                     evaluate(expr.prog[i], env, function CC(value) {
                         GUARD(CC, arguments)
                         loop(value, i + 1)
@@ -214,7 +242,7 @@ function evaluate(expr, env, callback) {
                 // GUARD(CC, arguments)
                 (function loop(args, i) {
                     GUARD(loop, arguments)
-                    if (i < expr.args.length) {
+                    if (i &lt; expr.args.length) {
                         evaluate(expr.args[i], env, function CC(arg) {
                             GUARD(CC, arguments)
                             args[i + 1] = arg
@@ -287,20 +315,20 @@ function applyOP(op, a, b) {
             return checkNumber(a) / checkDiv(b)
         case '%':
             return checkNumber(a) % checkDiv(b)
-        case '&&':
-            return a !== false && b
+        case '&amp;&amp;':
+            return a !== false &amp;&amp; b
         case '||':
             return a !== false ? a : b
-        case '<':
-            return checkNumber(a) < checkNumber(b)
+        case '&lt;':
+            return checkNumber(a) &lt; checkNumber(b)
         case '>':
             return checkNumber(a) > checkNumber(b)
-        case '<=':
-            return checkNumber(a) <= checkNumber(b)
+        case '&lt;=':
+            return checkNumber(a) &lt;= checkNumber(b)
         case '>=':
             return checkNumber(a) >= checkNumber(b)
-        case '<<':
-            return checkNumber(a) << checkNumber(b)
+        case '&lt;&lt;':
+            return checkNumber(a) &lt;&lt; checkNumber(b)
         case '>>':
             return checkNumber(a) >> checkNumber(b)
         case '==':
@@ -338,9 +366,9 @@ function makeLambda(expr, env) {
         GUARD(lambda, arguments)
         let names = expr.vars
         let scope = env.extend()
-        for (let i = 0; i < names.length; i++) {
+        for (let i = 0; i &lt; names.length; i++) {
             // some confusions
-            scope.def(names[i], i + 1 < arguments.length ? arguments[i + 1] : false)
+            scope.def(names[i], i + 1 &lt; arguments.length ? arguments[i + 1] : false)
         }
         evaluate(expr.body, scope, callback)
     }
@@ -357,7 +385,7 @@ var STACK_LEN
  */
 function GUARD(func, args) {
     // console.log(func)
-    if (--STACK_LEN < 0) {
+    if (--STACK_LEN &lt; 0) {
         throw new Continuation(func, args)
     }
 }
@@ -398,4 +426,26 @@ function Execute(func, args) {
 Environment.evaluate = evaluate
 Environment.Execute = Execute
 module.exports = Environment
-// Primitive functions
+// Primitive functions</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Environment.html">Environment</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyOP">applyOP</a></li><li><a href="global.html#checkDiv">checkDiv</a></li><li><a href="global.html#checkNumber">checkNumber</a></li><li><a href="global.html#checkType">checkType</a></li><li><a href="global.html#Continuation">Continuation</a></li><li><a href="global.html#evaluate">evaluate</a></li><li><a href="global.html#Execute">Execute</a></li><li><a href="global.html#GUARD">GUARD</a></li><li><a href="global.html#InputStream">InputStream</a></li><li><a href="global.html#makejs">makejs</a></li><li><a href="global.html#makeLambda">makeLambda</a></li><li><a href="global.html#parser">parser</a></li><li><a href="global.html#TokenStream">TokenStream</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Mon Sep 11 2017 21:14:55 GMT+0800 (中国标准时间)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,5 +1,0 @@
-#!bash
-
-git add .
-git commit -m "Automatic updates"
-git push
