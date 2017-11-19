@@ -2,7 +2,7 @@ module.exports = InputStream
 
 /**
  * 
- * The character input stream, can do something on one char
+ * The character input stream deals with line's message
  * @param {String} input code string
  * @returns {Object} inputstream used by TokenStream
  */
