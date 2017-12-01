@@ -1,4 +1,8 @@
-# sum = lambda(x, y) x + y; print(sum(2, 3));
-a = foo();
-b = bar();
-c = baz();
+fib = lambda(n) if n == 1 {
+        n;
+    }
+    else {
+        n * fib(n-1)
+    };
+
+fib(5);

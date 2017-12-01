@@ -42,7 +42,7 @@ function TokenStream(input) {
     }
 
     function isWhitespace(ch) {
-        return ' \t\n'.includes(ch)
+        return ' \t\r\n'.includes(ch)
     }
 
     /**
