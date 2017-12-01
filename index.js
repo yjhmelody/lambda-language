@@ -53,9 +53,7 @@ globalEnv.def("writeFile", function (k, filename, data) {
  * the continuation twice, once for each argument.
  */
 globalEnv.def("twice", function (k, a, b) {
-    // console.log('1!!!!!', a)
     k(a)
-    // console.log('2!!!!!', b)
     k(b)
 })
 

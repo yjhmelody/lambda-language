@@ -1,27 +1,18 @@
-# lambda-language
+# The lambda-language
 [![complier](https://img.shields.io/badge/lambda--langugage-complier-blue.svg)](https://github.com/yjhmelody/lambda-language)
-[![version](https://img.shields.io/badge/version-0.3.3-blue.svg)](https://github.com/yjhmelody/lambda-language)
+[![version](https://img.shields.io/badge/version-0.3.6-blue.svg)](https://github.com/yjhmelody/lambda-language)
 [![npm](https://img.shields.io/npm/dm/lambda-language.svg)](https://www.npmjs.com/package/lambda-language)
 
-
 ---
-It just was written for study
-
-## reference
-
-[blog](http://lisperator.net/pltut/eval1/play)
-
-## The toy language is written by javascript(basic now)
-
-## install
+## Install
 
 ```
-npm install lambda-language
+$ npm install lambda-language
 ```
 
-## syntax
+## Syntax
 
-ref the [example](./bin/lambda)
+ref the [example](./demo/demo1)
 
 ## API
 
@@ -36,19 +27,19 @@ The following are located in the corresponding file in `src`
 * Environment.evalute: eval ast expression with an env
 
 
-## run the language
+## Run the language
 
 ```
-bin/lambda  demo
+$ bin/lambda demo
 ```
 
-## complier the language to JS
+## Compile the language to JS
 
 ```
-bin/code-to-js demo2 [demo2.js]
+$ bin/code-to-js demo2 [demo2.js]
 ```
 
-### example about syntax
+### Some examples about syntax
 
 ```
 print_range = λ(a, b) if a <= b {
@@ -63,7 +54,6 @@ print_range(1, 10);
 ```
 
 output:
-
 ```
 1
 2
@@ -75,7 +65,6 @@ output:
 8
 9 
 10
-***Result: false
 ```
 
 ```
@@ -93,16 +82,15 @@ println(car(cdr(cdr(cdr(cdr(x))))));  # 5
 ```
 
 output:
-
 ```
 1
 2
 3
 4
 5
-***Result: false
 ```
 
+binded with some nodejs functions
 ```
 code = fs-readFileSync("./demo");
 println(code);
